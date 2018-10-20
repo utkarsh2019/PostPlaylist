@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +24,7 @@ public class MainActivity extends AppCompatActivity
 {
     static final int AUTH_UI_REQUEST_CODE = 1;
     private FirebaseAuth mAuth;
-
+    FirebaseDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -42,26 +44,46 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
+        // This line checks if the user is already signed in
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
             // already signed in
-        } else {
+            FirebaseDatabase db = FirebaseDatabase.getInstance();
+
+            // grabbing the user at that uid, as the reference
+            DatabaseReference userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
+                    getUid());
+
+            DatabaseReference posts = userRoot.child("posts");
+
+
+        }
+
+        else
+        {
+            // not signed in already
+            // open the gui for Firebase login via Google/Facebook/ etc.
+
             AuthUI authUI = AuthUI.getInstance();
+
             // Choose authentication providers
             List<AuthUI.IdpConfig> providers = Arrays.asList(
+                    new AuthUI.IdpConfig.FacebookBuilder().build(),
                     new AuthUI.IdpConfig.GoogleBuilder().build());
 
             // Create and launch sign-in intent
             startActivityForResult(
                     AuthUI.getInstance()
                             .createSignInIntentBuilder()
+                            .setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */,
+                                    true /* hints */)
                             .setAvailableProviders(providers)
                             .build(),
                     AUTH_UI_REQUEST_CODE);
         }
 
-        // initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
+
+
     }
 
     @Override
@@ -97,7 +119,7 @@ public class MainActivity extends AppCompatActivity
         {
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                recreate();
                 // ...
             } else {
                 // Sign in failed. If response is null the user canceled the
@@ -106,5 +128,10 @@ public class MainActivity extends AppCompatActivity
                 // ...
             }
         }
+    }
+
+    private void setUpUI()
+    {
+
     }
 }
