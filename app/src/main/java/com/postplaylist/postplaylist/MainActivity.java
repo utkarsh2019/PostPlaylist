@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,6 +57,16 @@ public class MainActivity extends AppCompatActivity
 
             DatabaseReference posts = userRoot.child("posts");
 
+            Button button2 = findViewById(R.id.button2);
+            button2.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    Intent addPostIntent = new Intent(getBaseContext(), AddPost.class);
+                    startActivity(addPostIntent);
+                }
+            });
 
         }
 

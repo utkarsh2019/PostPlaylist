@@ -1,8 +1,22 @@
 <resources>
     <string name="app_name">PostPlaylist</string>
     <string name="action_settings">Settings</string>
-
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">388389725032712</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb388389725032712</string>
+    <!-- Twitter consumer key and secret -->
+    <string name="twitter_consumer_key" translatable="false">POST_PLAYLIST</string>
+    <string name="twitter_consumer_secret" translatable="false">MY_PRECIOUS</string>
+    <!--Other string resources also defined in this file… -->
+    <string name="type">Type of Post</string>
+    <string name="type1">Image</string>
+    <string name="type2">Video/Movie</string>
+    <string name="type3">Meme</string>
+    <string name="type4">Article</string>
+    <string name="type5">Resource</string>
+    <string name="post_label">Add Post</string>
+    <string name="website_name_hint">Website name</string>
+    <string name="link">Link</string>
+    <string name="rating">Rate</string>
+    <string name="submit">Submit</string>
 </resources>
