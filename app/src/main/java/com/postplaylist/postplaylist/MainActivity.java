@@ -3,6 +3,8 @@ package com.postplaylist.postplaylist;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,11 +17,15 @@ import android.widget.Button;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -55,7 +61,8 @@ public class MainActivity extends AppCompatActivity
             DatabaseReference userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
                     getUid());
 
-            DatabaseReference posts = userRoot.child("posts");
+            // will, in a higher level sense, start listening to the data
+            setUpDatabaseListening(userRoot);
 
             Button button2 = findViewById(R.id.button2);
             button2.setOnClickListener(new View.OnClickListener()
@@ -67,6 +74,7 @@ public class MainActivity extends AppCompatActivity
                     startActivity(addPostIntent);
                 }
             });
+
 
         }
 
@@ -141,8 +149,42 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setUpUI()
+    private void setUpDatabaseListening(DatabaseReference aUser)
     {
+        ChildEventListener childEventListener = new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
+            {
+                System.out.println("flag 1");
+                System.out.println(dataSnapshot.getValue());
+            }
 
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
+            {
+                System.out.println("flag 2");
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot)
+            {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
+            {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+                System.out.println("flag 3");
+            }
+        };
+
+        aUser.child("categories").addChildEventListener(childEventListener);
     }
 }
