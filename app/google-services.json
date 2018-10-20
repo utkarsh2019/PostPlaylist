@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "475925097251",
+    "firebase_url": "https://postplaylist-b13a8.firebaseio.com",
+    "project_id": "postplaylist-b13a8",
+    "storage_bucket": "postplaylist-b13a8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475925097251:android:3286656ec4729b83",
+        "android_client_info": {
+          "package_name": "com.postplaylist.postplaylist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "475925097251-oar7uvjege7ev2j51skc5mchu5c50f6a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCotzixSGoZC_2JV2dw8K4cLDwsdtp-CTM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
