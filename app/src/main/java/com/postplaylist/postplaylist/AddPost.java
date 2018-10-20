@@ -16,6 +16,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class AddPost extends AppCompatActivity
 {
+
+
+    
     private DatabaseReference dr;
 
     @Override
