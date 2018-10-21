@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,6 +56,17 @@ public class MainActivity extends AppCompatActivity
                     getUid());
 
             DatabaseReference posts = userRoot.child("posts");
+
+            //initialising the settings menu button
+            //change to category button
+            FloatingActionButton categoryButton = findViewById(R.id.category_button);
+            categoryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
+                    startActivity(intent);
+                }
+            });
 
 
         }
