@@ -44,18 +44,18 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
-
+        int temp = 1;
         // This line checks if the user is already signed in
         mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
+        if (mAuth.getCurrentUser() != null || temp == 1) {
             // already signed in
             FirebaseDatabase db = FirebaseDatabase.getInstance();
 
             // grabbing the user at that uid, as the reference
-            DatabaseReference userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
-                    getUid());
+//            DatabaseReference userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
+//                    getUid());
 
-            DatabaseReference posts = userRoot.child("posts");
+//            DatabaseReference posts = userRoot.child("posts");
 
             Button button2 = findViewById(R.id.button2);
             button2.setOnClickListener(new View.OnClickListener()
