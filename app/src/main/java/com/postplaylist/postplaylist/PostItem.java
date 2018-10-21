@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -94,8 +95,9 @@ public class PostItem implements Serializable{
     /*
     This method converts a mapping of a post item obtained from the firebase to a normal postItem
      */
-    public static PostItem getFromMapping(DataSnapshot dataSnapshot)
+    public static List<PostItem> getFromMapping(DataSnapshot dataSnapshot)
     {
+        List<PostItem> postItemList = new ArrayList<>();
         for(DataSnapshot post: dataSnapshot.getChildren()){
             String description = (String) post.child("description").getValue();
             String link = (String) post.child("link").getValue();
@@ -104,8 +106,9 @@ public class PostItem implements Serializable{
             ArrayList categories = (ArrayList) post.child("categories").getValue();
             PostItem postItem = new PostItem(description, categories, link, rating);
             postItem.setDate(date);
-            return postItem;
+            postItemList.add(postItem);
         }
+        return postItemList;
     }
     //add more sorting options
 
