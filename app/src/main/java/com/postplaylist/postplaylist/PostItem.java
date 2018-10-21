@@ -98,6 +98,8 @@ public class PostItem implements Serializable{
 
             }
         }
+
+        return null;
     }
     //add more sorting options
 }

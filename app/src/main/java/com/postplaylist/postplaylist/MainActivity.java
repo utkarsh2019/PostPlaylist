@@ -1,6 +1,7 @@
 package com.postplaylist.postplaylist;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -37,9 +38,13 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity
 {
     static final int AUTH_UI_REQUEST_CODE = 1;
-    private FirebaseAuth mAuth;
+    public static FirebaseAuth mAuth;
+
+    // Posts and categories of the user. TODO: these might me in size of MB's later on !?
+    public static ArrayList<String> categories;
+    public static ArrayList<String> posts;
+
     FirebaseDatabase database;
-    ListView listView1;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -80,8 +85,8 @@ public class MainActivity extends AppCompatActivity
             categoryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
-                    startActivity(intent);
+                    Intent startAddPost = new Intent(MainActivity.this, AddPost.class);
+                    startActivity(startAddPost);
                 }
             });
 
@@ -143,6 +148,8 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings)
         {
+            Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -187,7 +194,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("flag 1");
                 System.out.println(dataSnapshot.getValue());
 
-                myAdapter.add((PostItem) dataSnapshot.getValue());
+                myAdapter.add(new PostItem());
                 myAdapter.notifyDataSetChanged();
 
             }
@@ -204,7 +211,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("flag 3");
                 // remove the matching thing in the underlying arraylist
                 // TODO: there is no equals defined in between two posts !
-                myAdapter.delete((PostItem) dataSnapshot.getValue());
+                // TODO: but delete the postitem that came
             }
 
             @Override
@@ -221,5 +228,27 @@ public class MainActivity extends AppCompatActivity
         };
 
         aUser.child("posts").addChildEventListener(childEventListener);
+    }
+
+    public static boolean performLoginCheckup(Context context)
+    {
+        if(mAuth == null)
+        {
+            Intent openLogin = new Intent(context, MainActivity.class);
+
+            context.startActivity(openLogin);
+            // there is no back from the login page, OK USER .!?
+            openLogin.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            return false;
+        }
+
+        else
+            return true;
+    }
+
+    public static void logout(Context context)
+    {
+        mAuth = null;
+        performLoginCheckup(context);
     }
 }

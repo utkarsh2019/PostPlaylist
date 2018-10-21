@@ -10,43 +10,64 @@
         android:id="@+id/textView"
         android:layout_width="96dp"
         android:layout_height="54dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_weight=".25"
         android:text="New Category:"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="10dp" />
+        app:layout_constraintEnd_toStartOf="@+id/category_edittext"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/category_edittext"
         android:layout_width="146dp"
         android:layout_height="37dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         android:layout_weight="0.35"
-        tools:layout_editor_absoluteX="127dp"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintEnd_toStartOf="@+id/save_button"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
         android:id="@+id/category_listview"
         android:layout_width="322dp"
         android:layout_height="343dp"
-        tools:layout_editor_absoluteX="31dp"
-        tools:layout_editor_absoluteY="84dp" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/category_edittext" />
 
     <Button
         android:id="@+id/logout_button"
-        android:layout_width="129dp"
+        android:layout_width="323dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginStart="28dp"
         android:background="@android:color/holo_red_light"
         android:text="LOGOUT"
-        tools:layout_editor_absoluteX="128dp"
-        tools:layout_editor_absoluteY="437dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/save_button"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         android:background="@android:color/holo_green_light"
         android:text="Save"
-        tools:layout_editor_absoluteX="289dp"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

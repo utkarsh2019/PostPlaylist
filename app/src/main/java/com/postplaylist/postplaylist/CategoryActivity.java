@@ -9,6 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class CategoryActivity extends AppCompatActivity implements View.OnClickListener{
 
     private Button logoutButton;
@@ -21,7 +25,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_category);
 
         logoutButton = (Button) findViewById(R.id.logout_button);
-        savebutton = (Button) findViewById(R.id.save_btn);
+        savebutton = (Button) findViewById(R.id.save_button);
         CatEditText = (EditText)findViewById(R.id.category_edittext);
 
         logoutButton.setOnClickListener(this);
@@ -31,9 +35,10 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
     public void onClick (View v) {
         switch (v.getId()){
             case R.id.logout_button :
-                onBackPressed();
+                MainActivity.logout(getApplicationContext());
+                break;
 
-            case R.id.save_button :
+            case R.id.save_button:
                 String CatName = CatEditText.getText().toString();
                 if(CatName.isEmpty()){
                     AlertDialog alertDialog = new AlertDialog.Builder(CategoryActivity.this).create();
@@ -46,26 +51,22 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
                                 }
                             });
                     alertDialog.show();
+                    break;
                 }
 
                 //TODO checks if category is already present from the database
-                else if(false){
-                    AlertDialog alertDialog = new AlertDialog.Builder(CategoryActivity.this).create();
-                    alertDialog.setTitle("Alert");
-                    alertDialog.setMessage("Category Name already exists");
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    alertDialog.show();
-                }
-                else {
-                   //adds to database
-                    onBackPressed();
-                }
+                if(! MainActivity.performLoginCheckup(this))
+                    return;
 
+                else
+                {
+                    // add to the list of the categories
+                    FirebaseDatabase db = FirebaseDatabase.getInstance();
+                    DatabaseReference userRoot = db.getReference().child(
+                            "Users/" + MainActivity.mAuth.getUid());
+                    userRoot.child("categories").push().setValue(CatName);
+                }
+                break;
         }
     }
 
