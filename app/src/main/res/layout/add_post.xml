@@ -99,7 +99,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/submit_button"
-            android:layout_gravity="center">
+            android:layout_gravity="left">
+        </Button>
+
+        <Button
+            android:text="@string/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/delete_button"
+            android:layout_gravity="right">
         </Button>
     </LinearLayout>
 </ScrollView>

@@ -1,5 +1,8 @@
 package com.postplaylist.postplaylist;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseException;
 
@@ -17,13 +20,14 @@ TODO: We still need to provide a str to date conversion. With that, we will make
 for the date field in this class. After that, we can store/remember/serialize the date field too
 assign to: Mazahir
  */
-public class PostItem implements Serializable{
+public class PostItem implements Serializable {
 
     private String description;
     private String date;
     private ArrayList<String> categories;
     private String link;
     private long rating;
+    private String key;
 
     //getting current date and time
     private Calendar calendar = Calendar.getInstance();
@@ -41,12 +45,13 @@ public class PostItem implements Serializable{
         This constructor is to be used for internal purposes and probably when adding a post
         The date of this PostItem instance is the time of generation
      */
-    public PostItem (String description, ArrayList<String> categories, String link, long rating){
+    public PostItem (String description, ArrayList<String> categories, String link, long rating, String key){
         this.description = description;
         this.date = strDate;
         this.categories = categories;
         this.link = link;
         this.rating = rating;
+        this.key = key;
     }
 
     //getters and setters
@@ -55,6 +60,10 @@ public class PostItem implements Serializable{
     }
     public void setDescription (String description){this.description = description; }
 
+    public String getKey() {
+        return key;
+    }
+    public void setKey (String key){this.key = key; }
 
     public ArrayList<String> getCategories() {
         return categories;
@@ -106,6 +115,7 @@ public class PostItem implements Serializable{
         String date = "";
         String link = "";
         ArrayList<String> categories = null;
+        String key = "";
 
 
         // loop to read through the children
@@ -143,9 +153,14 @@ public class PostItem implements Serializable{
             {
                 categories = new ArrayList<String>((ArrayList<String>) child.getValue());
             }
+
+            if(child.getKey().equals("key"))
+            {
+                key = (String) child.getValue();
+            }
         }
 
-        postItem = new PostItem(description, categories, link, rating);
+        postItem = new PostItem(description, categories, link, rating, key);
         postItem.setDate(date);
         return postItem;
     }

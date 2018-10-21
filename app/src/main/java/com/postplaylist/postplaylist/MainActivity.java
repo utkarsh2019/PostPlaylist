@@ -42,28 +42,18 @@ public class MainActivity extends AppCompatActivity
 
     // Posts and categories of the user. TODO: these might me in size of MB's later on !?
     public static ArrayList<String> categories;
-    public static ArrayList<String> posts;
+    public static ArrayList<PostItem> posts;
     public static MyAdapter myAdapter;
 
     FirebaseDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        posts = new ArrayList<PostItem>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         //To be used for Utkarsh only. Set to 0 for all other developers
         int testUtkarsh = 1;
@@ -97,6 +87,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick(View view) {
                     Intent startAddPost = new Intent(MainActivity.this, AddPost.class);
+                    startAddPost.setFlags(0);
                     startActivity(startAddPost);
                 }
             });
@@ -204,9 +195,10 @@ public class MainActivity extends AppCompatActivity
             {
                 System.out.println("flag 1");
                 System.out.println(dataSnapshot.getValue());
-
-                myAdapter.add(PostItem.getFromMapping(dataSnapshot));
+                PostItem postItem = PostItem.getFromMapping(dataSnapshot);
+                myAdapter.add(postItem);
                 myAdapter.notifyDataSetChanged();
+                posts.add(postItem);
 
             }
 

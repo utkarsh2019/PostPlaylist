@@ -91,7 +91,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
      * @param position The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, int position)
+    public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, final int position)
     {
         View v = holder.v;
         final PostItem post = posts.get(position);
@@ -101,6 +101,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
         RatingBar ratingBar = v.findViewById(R.id.ratingBar1);
         ratingBar.setRating((float)post.getRating());
 
+        v.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view) {
+                String key = post.getKey();
+                Intent intent = new Intent(view.getContext(), AddPost.class);
+                intent.putExtra("editFlag", true);
+                intent.putExtra("position", position);
+                view.getContext().startActivity(intent);
+            }
+        });
         Button button = v.findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener()
         {
