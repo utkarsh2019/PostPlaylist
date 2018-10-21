@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,10 +61,22 @@ public class MainActivity extends AppCompatActivity
 
         //setting up the spinner
         Spinner sortSpinner = (Spinner) findViewById(R.id.sort_spinner);
+        ArrayList<String> sortByStrings = new ArrayList<>();
+        sortByStrings.add("Date: Newest");
+        sortByStrings.add("Date: Oldest");
+        sortByStrings.add("Rating: Highest");
+        sortByStrings.add("Rating: Lowest");
+        sortByStrings.add("Category");
+        ArrayAdapter arrayAdapter = new ArrayAdapter(
+                getBaseContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                sortByStrings);
+        sortSpinner.setAdapter(arrayAdapter);
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Comparator comparator = null;
+                if(myAdapter == null)
+                    return;
                 switch (position)
                 {
                     case 0:
@@ -71,25 +84,27 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case 1:
                         //TODO: Change the myadapter thingmthingm
-                        MyAdapter.sort(new Comparator<PostItem>()
+                        myAdapter.sort(new Comparator<PostItem>()
                         {
                             @Override
                             public int compare(PostItem t1, PostItem t2) {
                                 return t1.getDate().compareTo(t2.getDate());
                             }
                         });
+                        myAdapter.notifyDataSetChanged();
                         break;
                     case 2:
-                        dfd.sort(new Comparator<PostItem>()
+                        myAdapter.sort(new Comparator<PostItem>()
                         {
                             @Override
                             public int compare(PostItem t1, PostItem t2) {
                                 return t1.getDate().compareTo(t2.getDate());
                             }
                         });
+                        myAdapter.notifyDataSetChanged();
                         break;
                     case 3:
-                        dfd.sort(new Comparator<PostItem>()
+                        myAdapter.sort(new Comparator<PostItem>()
                         {
                             @Override
                             public int compare(PostItem t1, PostItem t2) {
@@ -106,9 +121,10 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                         });
+                        myAdapter.notifyDataSetChanged();
                         break;
                     case 4:
-                        dfd.sort(new Comparator<PostItem>() {
+                        myAdapter.sort(new Comparator<PostItem>() {
                             @Override
                             public int compare(PostItem t1, PostItem t2) {
                                 float rating1 = t1.getRating();
@@ -124,10 +140,11 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                         });
+                        myAdapter.notifyDataSetChanged();
                         break;
 
                     case 5:
-                        dfd.sort(new Comparator<PostItem>() {
+                        myAdapter.sort(new Comparator<PostItem>() {
                             @Override
                             public int compare(PostItem t1, PostItem t2) {
                                 if (t1.getCategories()!= null && t2.getCategories() != null){
@@ -153,6 +170,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                         );
+                        myAdapter.notifyDataSetChanged();
                         break;
 
                 }
