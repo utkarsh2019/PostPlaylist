@@ -112,6 +112,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
                 editIntent.putExtra("post", post);
                 context.startActivity(editIntent);
             }
+
         });
         Button button = v.findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener()

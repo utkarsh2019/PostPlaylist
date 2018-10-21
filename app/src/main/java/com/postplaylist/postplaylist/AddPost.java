@@ -1,7 +1,10 @@
 package com.postplaylist.postplaylist;
 
 
+import android.content.Context;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +14,10 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.guna.libmultispinner.MultiSelectionSpinner;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,6 +38,11 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
         setContentView(R.layout.add_post);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         final String uid;
+
+        // TODO: call only if edit is on
+            // Kalpan code
+            runAsyncQuery(getBaseContext());
+            // Kalpan code
 
         //To be used for Utkarsh only. Set to 0 for all other developers
         int testUtkarsh = 1;
@@ -104,6 +116,10 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
         return super.onOptionsItemSelected(item);
     }
 
+    public void setGUI(ArrayList<String> categories)
+    {
+        // just a dummy function to pass
+    }
     @Override
     public void selectedIndices(List<Integer> indices) {
 
@@ -112,5 +128,34 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
     @Override
     public void selectedStrings(List<String> categories) {
         c = new ArrayList<String>(categories);
+    }
+
+    public void runAsyncQuery(Context context)
+    {
+        if(! MainActivity.performLoginCheckup(context))
+            return;
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userRoot = FirebaseDatabase.getInstance().getReference().child("Users/" +
+                                                                                            uid);
+        ValueEventListener valueEventListener = new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                ArrayList<String> categories;
+                categories = (ArrayList<String>) dataSnapshot.getValue();
+                setGUI(categories);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+
+            }
+        };
+
+        userRoot.child("categories").addValueEventListener(valueEventListener);
+
     }
 }
