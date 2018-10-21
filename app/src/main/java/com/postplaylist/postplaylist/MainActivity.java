@@ -8,11 +8,16 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,7 +28,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +39,7 @@ public class MainActivity extends AppCompatActivity
     static final int AUTH_UI_REQUEST_CODE = 1;
     private FirebaseAuth mAuth;
     FirebaseDatabase database;
+    ListView listView1;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -55,27 +63,26 @@ public class MainActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
             // already signed in
+
             FirebaseDatabase db = FirebaseDatabase.getInstance();
 
             // grabbing the user at that uid, as the reference
             DatabaseReference userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
                     getUid());
 
-            // will, in a higher level sense, start listening to the data
+            // will, in a higher level sense, start listening to the data.
+            // it will set up the recycler and the listeners inside !!
             setUpDatabaseListening(userRoot);
 
-            Button button2 = findViewById(R.id.button2);
-            button2.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View view)
-                {
-                    Intent addPostIntent = new Intent(getBaseContext(), AddPost.class);
-                    startActivity(addPostIntent);
-                }
-            });
 
-
+            // temporary to create data on the database
+            String description = "a suggestion by Mohammad Ali!";
+            String link = "google.com";
+            int rating = 5;
+            String[] categories1 = {"sports", "leisure", "food"};
+            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
+            PostItem postItem = new PostItem(description, categories, link, rating);
+            userRoot.child("posts").push().setValue(postItem);
         }
 
         else
@@ -100,6 +107,7 @@ public class MainActivity extends AppCompatActivity
                             .build(),
                     AUTH_UI_REQUEST_CODE);
         }
+
 
 
 
@@ -151,13 +159,26 @@ public class MainActivity extends AppCompatActivity
 
     private void setUpDatabaseListening(DatabaseReference aUser)
     {
+        RecyclerView recyclerView = findViewById(R.id.mainRecyclerView);
+
+        // using a linear layout manager for the recycler view
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getBaseContext());
+        recyclerView.setLayoutManager(mLinearLayoutManager);
+        final MyAdapter myAdapter = new MyAdapter(this, new ArrayList<PostItem>());
+        recyclerView.setAdapter(myAdapter);
+
         ChildEventListener childEventListener = new ChildEventListener()
         {
+
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
             {
                 System.out.println("flag 1");
                 System.out.println(dataSnapshot.getValue());
+
+                myAdapter.add((PostItem) dataSnapshot.getValue());
+                myAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -169,7 +190,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot)
             {
-
+                System.out.println("flag 3");
+                // remove the matching thing in the underlying arraylist
+                // TODO: there is no equals defined in between two posts !
+                myAdapter.delete((PostItem) dataSnapshot.getValue());
             }
 
             @Override
@@ -181,10 +205,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError)
             {
-                System.out.println("flag 3");
+                System.out.println("flag 4");
             }
         };
 
-        aUser.child("categories").addChildEventListener(childEventListener);
+        aUser.child("posts").addChildEventListener(childEventListener);
     }
 }
