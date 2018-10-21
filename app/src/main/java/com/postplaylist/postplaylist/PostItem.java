@@ -22,7 +22,7 @@ public class PostItem implements Serializable{
     private String date;
     private ArrayList<String> categories;
     private String link;
-    private int rating;
+    private long rating;
 
     //getting current date and time
     private Calendar calendar = Calendar.getInstance();
@@ -40,7 +40,7 @@ public class PostItem implements Serializable{
         This constructor is to be used for internal purposes and probably when adding a post
         The date of this PostItem instance is the time of generation
      */
-    public PostItem (String description, ArrayList<String> categories, String link, int rating){
+    public PostItem (String description, ArrayList<String> categories, String link, long rating){
         this.description = description;
         this.date = strDate;
         this.categories = categories;
@@ -60,10 +60,10 @@ public class PostItem implements Serializable{
     }
     public void setCategories(ArrayList<String> categories){this.categories = categories;}
 
-    public int getRating() {
+    public long getRating() {
         return rating;
     }
-    public void setRating(int rating){this.rating = rating;}
+    public void setRating(long rating){this.rating = rating;}
 
     public String getLink()
     {
@@ -95,20 +95,22 @@ public class PostItem implements Serializable{
     /*
     This method converts a mapping of a post item obtained from the firebase to a normal postItem
      */
-    public static List<PostItem> getFromMapping(DataSnapshot dataSnapshot)
+    public static PostItem getFromMapping(DataSnapshot dataSnapshot)
     {
-        List<PostItem> postItemList = new ArrayList<>();
+        PostItem postItem = null;
+
         for(DataSnapshot post: dataSnapshot.getChildren()){
             String description = (String) post.child("description").getValue();
             String link = (String) post.child("link").getValue();
             String date = (String) post.child("date").getValue();
             int rating = (int) post.child("rating").getValue();
             ArrayList categories = (ArrayList) post.child("categories").getValue();
-            PostItem postItem = new PostItem(description, categories, link, rating);
+
+            postItem = new PostItem(description, categories, link, rating);
             postItem.setDate(date);
-            postItemList.add(postItem);
         }
-        return postItemList;
+
+        return postItem;
     }
     //add more sorting options
 

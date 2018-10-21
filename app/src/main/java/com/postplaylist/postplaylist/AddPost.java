@@ -6,11 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.guna.libmultispinner.MultiSelectionSpinner;
@@ -19,11 +17,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.OnMultipleItemsSelectedListener
 {
-    private List<String> categories;
+    private ArrayList<String> c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +30,23 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_post);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth == null) {
+        final String uid;
+
+        //To be used for Utkarsh only. Set to 0 for all other developers
+        int testUtkarsh = 1;
+
+        if (testUtkarsh != 1) {
+            uid = mAuth.getUid();
+        }
+        else {
+            uid = "Y1ftkRetggVB7nRm18Sxw17B85G3";
+        }
+
+        if (mAuth == null && testUtkarsh != 1) {
             finish();
         }
         DatabaseReference categories = FirebaseDatabase.getInstance().getReference("Users/"
-                        +mAuth.getUid()+"/categories");
+                        +uid+"/categories");
 
         String [] cats = {"Pics","Videos","News","Sports"};
         MultiSelectionSpinner type = (MultiSelectionSpinner) findViewById(R.id.spinner_type);
@@ -49,18 +60,22 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
         final EditText link = (EditText) findViewById(R.id.edit_text_link);
 
         Button submitButton = (Button) findViewById(R.id.submit_button);
-        //final TextView ratingDisplayTextView = (TextView) findViewById(R.id.rating_display_text_View);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (link.getText().toString().trim().equals("")) {
-                    Toast.makeText(getBaseContext(), "Please enter a link", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), "Please enter a link", Toast.LENGTH_SHORT)
+                            .show();
                 }
                 else {
-                    System.out.println("Rating"+rating.getRating());
-                    System.out.println("Website"+website.getText().toString().trim());
-                    System.out.println("Link"+link.getText().toString().trim());
+                    long r = (long)rating.getRating();
+                    String d = website.getText().toString().trim();
+                    String l = link.getText().toString().trim();
+                    PostItem newPost = new PostItem(d,c,l,r);
+                    DatabaseReference posts = FirebaseDatabase.getInstance().getReference(
+                            "Users/"+uid+"/posts");
+                    posts.push().setValue(newPost);
                     finish();
                 }
             }
@@ -95,7 +110,7 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
     }
 
     @Override
-    public void selectedStrings(List<String> strings) {
-        Toast.makeText(this, strings.toString(), Toast.LENGTH_LONG).show();
+    public void selectedStrings(List<String> categories) {
+        c = new ArrayList<String>(categories);
     }
 }

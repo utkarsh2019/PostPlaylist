@@ -63,7 +63,10 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
+
+        //To be used for Utkarsh only. Set to 0 for all other developers
         int testUtkarsh = 1;
+
         // This line checks if the user is already signed in
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null || testUtkarsh == 1) {
@@ -99,13 +102,13 @@ public class MainActivity extends AppCompatActivity
 
 
             // temporary to create data on the database
-            String description = "a suggestion by Mohammad Ali!";
-            String link = "google.com";
-            int rating = 5;
-            String[] categories1 = {"sports", "leisure", "food"};
-            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
-            PostItem postItem = new PostItem(description, categories, link, rating);
-            userRoot.child("posts").push().setValue(postItem);
+//            String description = "a suggestion by Mohammad Ali!";
+//            String link = "google.com";
+//            int rating = 5;
+//            String[] categories1 = {"sports", "leisure", "food"};
+//            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
+//            PostItem postItem = new PostItem(description, categories, link, rating);
+//            userRoot.child("posts").push().setValue(postItem);
         }
 
         else

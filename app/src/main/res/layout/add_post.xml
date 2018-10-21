@@ -89,7 +89,7 @@
             android:layout_width="245dp"
             android:layout_height="40dp"
             android:numStars="5"
-            android:stepSize=".5"
+            android:stepSize="1"
             android:layout_marginTop="10dp"
             android:layout_gravity="center">
         </RatingBar>
