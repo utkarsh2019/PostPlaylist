@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("flag 3");
                 // remove the matching thing in the underlying arraylist
                 // TODO: there is no equals defined in between two posts !
-                myAdapter.delete((PostItem) dataSnapshot.getValue());
+                myAdapter.delete(PostItem.getFromMapping(dataSnapshot));
             }
 
             @Override

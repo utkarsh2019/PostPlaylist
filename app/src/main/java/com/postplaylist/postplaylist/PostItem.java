@@ -1,5 +1,7 @@
 package com.postplaylist.postplaylist;
 
+import com.google.firebase.database.DataSnapshot;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -45,12 +47,6 @@ public class PostItem implements Serializable{
         this.rating = rating;
     }
 
-
-    public String getDate()
-    {
-        return date;
-    }
-
     //getters and setters
     public String getDescription() {
         return description;
@@ -77,6 +73,15 @@ public class PostItem implements Serializable{
         this.link = link;
     }
 
+    public String getDate()
+    {
+        return date;
+    }
+    public void setDate(String date)
+    {
+        this.date = date;
+    }
+
     static Comparator<PostItem> getClosestAddedComparator() {
         return new Comparator<PostItem>() {
             @Override
@@ -89,15 +94,29 @@ public class PostItem implements Serializable{
     /*
     This method converts a mapping of a post item obtained from the firebase to a normal postItem
      */
-    public static PostItem getFromMapping(HashMap<String, Object> mapping)
+    public static PostItem getFromMapping(DataSnapshot dataSnapshot)
     {
-        for(Map.Entry<String, Object> entry : mapping.entrySet())
-        {
-            if(entry.getKey().equals("description"))
-            {
-
-            }
+        for(DataSnapshot post: dataSnapshot.getChildren()){
+            String description = (String) post.child("description").getValue();
+            String link = (String) post.child("link").getValue();
+            String date = (String) post.child("date").getValue();
+            int rating = (int) post.child("rating").getValue();
+            ArrayList categories = (ArrayList) post.child("categories").getValue();
+            PostItem postItem = new PostItem(description, categories, link, rating);
+            postItem.setDate(date);
+            return postItem;
         }
+        return null;
     }
     //add more sorting options
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this.getLink().equals(((PostItem) obj).getLink())){
+            return true;
+        }
+        else
+            return false;
+    }
 }
