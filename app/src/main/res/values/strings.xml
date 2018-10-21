@@ -19,4 +19,9 @@
     <string name="link">Link</string>
     <string name="rating">Rate</string>
     <string name="submit">Submit</string>
+    <string name="about_us">
+        About us\n
+        Kalpan Jasani, Mazahir Pachisa, Utkarsh Agarwal\n
+                       Boilermake VI
+    </string>
 </resources>
