@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity
 
             //initialising the settings menu button
             //change to category button
-            FloatingActionButton categoryButton = findViewById(R.id.category_button);
+            FloatingActionButton categoryButton = findViewById(R.id.fab);
             categoryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
