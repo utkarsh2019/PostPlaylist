@@ -1,30 +1,49 @@
 package com.postplaylist.postplaylist;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
 {
     static final int AUTH_UI_REQUEST_CODE = 1;
-    private FirebaseAuth mAuth;
+    public static FirebaseAuth mAuth;
+
+    // Posts and categories of the user. TODO: these might me in size of MB's later on !?
+    public static ArrayList<String> categories;
+    public static ArrayList<String> posts;
+
     FirebaseDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -44,30 +63,49 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
-        int temp = 1;
+        int testUtkarsh = 1;
         // This line checks if the user is already signed in
         mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null || temp == 1) {
+        if (mAuth.getCurrentUser() != null || testUtkarsh == 1) {
             // already signed in
+
             FirebaseDatabase db = FirebaseDatabase.getInstance();
 
+            DatabaseReference userRoot;
             // grabbing the user at that uid, as the reference
-//            DatabaseReference userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
-//                    getUid());
+            if (testUtkarsh != 1) {
+                userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
+                        getUid());
+            }
+            else {
+                userRoot = db.getReference("Users/Y1ftkRetggVB7nRm18Sxw17B85G3");
+            }
 
-//            DatabaseReference posts = userRoot.child("posts");
+            // will, in a higher level sense, start listening to the data.
+            // it will set up the recycler and the listeners inside !!
+            setUpDatabaseListening(userRoot);
 
-            Button button2 = findViewById(R.id.button2);
-            button2.setOnClickListener(new View.OnClickListener()
-            {
+
+            //initialising the settings menu button
+            //change to category button
+            FloatingActionButton categoryButton = findViewById(R.id.category_button);
+            categoryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view)
-                {
-                    Intent addPostIntent = new Intent(getBaseContext(), AddPost.class);
-                    startActivity(addPostIntent);
+                public void onClick(View view) {
+                    Intent startAddPost = new Intent(MainActivity.this, AddPost.class);
+                    startActivity(startAddPost);
                 }
             });
 
+
+            // temporary to create data on the database
+            String description = "a suggestion by Mohammad Ali!";
+            String link = "google.com";
+            int rating = 5;
+            String[] categories1 = {"sports", "leisure", "food"};
+            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
+            PostItem postItem = new PostItem(description, categories, link, rating);
+            userRoot.child("posts").push().setValue(postItem);
         }
 
         else
@@ -95,6 +133,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
+
     }
 
     @Override
@@ -116,6 +155,8 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings)
         {
+            Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -141,8 +182,79 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setUpUI()
+    private void setUpDatabaseListening(DatabaseReference aUser)
     {
+        RecyclerView recyclerView = findViewById(R.id.mainRecyclerView);
 
+        // using a linear layout manager for the recycler view
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getBaseContext());
+        recyclerView.setLayoutManager(mLinearLayoutManager);
+        final MyAdapter myAdapter = new MyAdapter(this, new ArrayList<PostItem>());
+        recyclerView.setAdapter(myAdapter);
+
+        ChildEventListener childEventListener = new ChildEventListener()
+        {
+
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
+            {
+                System.out.println("flag 1");
+                System.out.println(dataSnapshot.getValue());
+
+                myAdapter.add(new PostItem());
+                myAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
+            {
+                System.out.println("flag 2");
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot)
+            {
+                System.out.println("flag 3");
+                // remove the matching thing in the underlying arraylist
+                myAdapter.delete(PostItem.getFromMapping(dataSnapshot));
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
+            {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+                System.out.println("flag 4");
+            }
+        };
+
+        aUser.child("posts").addChildEventListener(childEventListener);
+    }
+
+    public static boolean performLoginCheckup(Context context)
+    {
+        if(mAuth == null)
+        {
+            Intent openLogin = new Intent(context, MainActivity.class);
+
+            context.startActivity(openLogin);
+            // there is no back from the login page, OK USER .!?
+            openLogin.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            return false;
+        }
+
+        else
+            return true;
+    }
+
+    public static void logout(Context context)
+    {
+        mAuth = null;
+        performLoginCheckup(context);
     }
 }

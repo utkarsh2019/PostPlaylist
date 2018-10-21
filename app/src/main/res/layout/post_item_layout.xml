@@ -10,11 +10,11 @@
         android:layout_weight="0.7"
         android:textSize="15sp"
         android:layout_height="match_parent" />
-    <TextView
-        android:id="@+id/item_date"
-        android:textColor="#d3d3d3"
+
+    <Button
+        android:id="@+id/button2"
         android:layout_width="0dp"
-        android:paddingLeft="30dp"
-        android:layout_weight="0.3"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_weight="0.7"
+        android:text="Button" />
 </LinearLayout>
