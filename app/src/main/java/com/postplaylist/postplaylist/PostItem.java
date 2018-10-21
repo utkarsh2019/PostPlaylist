@@ -96,16 +96,19 @@ public class PostItem implements Serializable{
      */
     public static PostItem getFromMapping(DataSnapshot dataSnapshot)
     {
+        PostItem postItem = null;
         for(DataSnapshot post: dataSnapshot.getChildren()){
             String description = (String) post.child("description").getValue();
             String link = (String) post.child("link").getValue();
             String date = (String) post.child("date").getValue();
             int rating = (int) post.child("rating").getValue();
             ArrayList categories = (ArrayList) post.child("categories").getValue();
-            PostItem postItem = new PostItem(description, categories, link, rating);
+
+            postItem = new PostItem(description, categories, link, rating);
             postItem.setDate(date);
-            return postItem;
         }
+
+        return postItem;
     }
     //add more sorting options
 
