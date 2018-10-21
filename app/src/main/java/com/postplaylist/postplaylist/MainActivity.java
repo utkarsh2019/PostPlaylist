@@ -204,6 +204,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
             {
+                PostItem postItem = PostItem.getFromMapping(dataSnapshot);
+                myAdapter.delete(PostItem.getFromMapping(dataSnapshot));
+                myAdapter.add(postItem);
+                posts.remove(postItem);
+                posts.add(postItem);
                 System.out.println("flag 2");
             }
 
