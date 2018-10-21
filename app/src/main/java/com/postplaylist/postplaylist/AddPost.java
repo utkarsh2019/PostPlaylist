@@ -163,6 +163,7 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
                     DatabaseReference posts = FirebaseDatabase.getInstance().getReference(
                             "Users/"+uid+"/posts/"+inKey);
                     posts.setValue(null);
+                    finish();
                 }
             });
         }

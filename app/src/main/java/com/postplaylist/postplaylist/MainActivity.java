@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick(View view) {
                     Intent startAddPost = new Intent(MainActivity.this, AddPost.class);
+                    startAddPost.putExtra("editPost",false);
                     startAddPost.setFlags(0);
                     startActivity(startAddPost);
                 }
@@ -94,13 +95,15 @@ public class MainActivity extends AppCompatActivity
 
 
             // temporary to create data on the database
-//            String description = "a suggestion by Mohammad Ali!";
-//            String link = "google.com";
-//            int rating = 5;
-//            String[] categories1 = {"sports", "leisure", "food"};
-//            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
-//            PostItem postItem = new PostItem(description, categories, link, rating);
-//            userRoot.child("posts").push().setValue(postItem);
+            String description = "a suggestion by Mohammad Ali!";
+            String link = "boilermake.org";
+            int rating = 5;
+            String[] categories1 = {"sports", "leisure", "food"};
+            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
+
+            String k = userRoot.child("posts").push().getKey();
+            PostItem postItem = new PostItem(description, categories, link, rating, k);
+            userRoot.child("posts").child(k).setValue(postItem);
         }
 
         else
@@ -125,10 +128,6 @@ public class MainActivity extends AppCompatActivity
                             .build(),
                     AUTH_UI_REQUEST_CODE);
         }
-
-
-
-
     }
 
     @Override
