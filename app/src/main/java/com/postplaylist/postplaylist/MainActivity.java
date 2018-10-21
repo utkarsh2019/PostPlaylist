@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity
     // Posts and categories of the user. TODO: these might me in size of MB's later on !?
     public static ArrayList<String> categories;
     public static ArrayList<String> posts;
+    public static MyAdapter myAdapter;
 
     FirebaseDatabase database;
     @Override
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity
         // using a linear layout manager for the recycler view
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getBaseContext());
         recyclerView.setLayoutManager(mLinearLayoutManager);
-        final MyAdapter myAdapter = new MyAdapter(this, new ArrayList<PostItem>());
+        myAdapter = new MyAdapter(this, new ArrayList<PostItem>());
         recyclerView.setAdapter(myAdapter);
 
         ChildEventListener childEventListener = new ChildEventListener()
@@ -194,7 +195,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("flag 1");
                 System.out.println(dataSnapshot.getValue());
 
-                myAdapter.add(new PostItem());
+                myAdapter.add(PostItem.getFromMapping(dataSnapshot));
                 myAdapter.notifyDataSetChanged();
 
             }
@@ -234,10 +235,9 @@ public class MainActivity extends AppCompatActivity
         if(mAuth == null)
         {
             Intent openLogin = new Intent(context, MainActivity.class);
-
+            openLogin.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             context.startActivity(openLogin);
             // there is no back from the login page, OK USER .!?
-            openLogin.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             return false;
         }
 
@@ -247,7 +247,13 @@ public class MainActivity extends AppCompatActivity
 
     public static void logout(Context context)
     {
+        FirebaseAuth.getInstance().signOut();
         mAuth = null;
+        posts = null;
+        categories = null;
+
+        // TODO: clear the adapter data after a logout too. Or think about clearing the window data
+//        MainActivity.myAdapter
         performLoginCheckup(context);
     }
 }

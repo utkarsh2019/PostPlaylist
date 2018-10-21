@@ -1,6 +1,7 @@
 package com.postplaylist.postplaylist;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class PostItem implements Serializable{
     private String date;
     private ArrayList<String> categories;
     private String link;
-    private int rating;
+    private long rating;
 
     //getting current date and time
     private Calendar calendar = Calendar.getInstance();
@@ -39,7 +40,7 @@ public class PostItem implements Serializable{
         This constructor is to be used for internal purposes and probably when adding a post
         The date of this PostItem instance is the time of generation
      */
-    public PostItem (String description, ArrayList<String> categories, String link, int rating){
+    public PostItem (String description, ArrayList<String> categories, String link, long rating){
         this.description = description;
         this.date = strDate;
         this.categories = categories;
@@ -59,10 +60,10 @@ public class PostItem implements Serializable{
     }
     public void setCategories(ArrayList<String> categories){this.categories = categories;}
 
-    public int getRating() {
+    public long getRating() {
         return rating;
     }
-    public void setRating(int rating){this.rating = rating;}
+    public void setRating(long rating){this.rating = rating;}
 
     public String getLink()
     {
@@ -97,17 +98,54 @@ public class PostItem implements Serializable{
     public static PostItem getFromMapping(DataSnapshot dataSnapshot)
     {
         PostItem postItem = null;
-        for(DataSnapshot post: dataSnapshot.getChildren()){
-            String description = (String) post.child("description").getValue();
-            String link = (String) post.child("link").getValue();
-            String date = (String) post.child("date").getValue();
-            int rating = (int) post.child("rating").getValue();
-            ArrayList categories = (ArrayList) post.child("categories").getValue();
 
-            postItem = new PostItem(description, categories, link, rating);
-            postItem.setDate(date);
+        // default bad (impossible values)
+        String description = "";
+        long rating = -1;
+        String date = "";
+        String link = "";
+        ArrayList<String> categories = null;
+
+
+        // loop to read through the children
+        for(DataSnapshot child: dataSnapshot.getChildren()){
+
+
+            if(child.getValue() == null)
+                throw new DatabaseException("A child of post (category, rating, etc.) returned null"
+                + " for on getValue()");
+
+            if(child.getKey().equals("description"))
+            {
+                description = (String) child.getValue();
+                continue;
+            }
+
+            if(child.getKey().equals("rating"))
+            {
+                rating = (long) child.getValue();
+                continue;
+            }
+
+            if(child.getKey().equals("link"))
+            {
+                link = (String) child.getValue();
+                continue;
+            }
+
+            if(child.getKey().equals("date"))
+            {
+                date = (String) child.getValue();
+            }
+
+            if(child.getKey().equals("categories"))
+            {
+                categories = new ArrayList<String>((ArrayList<String>) child.getValue());
+            }
         }
 
+        postItem = new PostItem(description, categories, link, rating);
+        postItem.setDate(date);
         return postItem;
     }
     //add more sorting options

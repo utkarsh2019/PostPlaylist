@@ -1,12 +1,16 @@
 package com.postplaylist.postplaylist;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -90,9 +94,34 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
     public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, int position)
     {
         View v = holder.v;
-        String link = posts.get(position).getLink();
-        TextView textView = v.findViewById(R.id.item_note);
-        textView.setText("Kalpan");
+        final PostItem post = posts.get(position);
+        TextView textView = v.findViewById(R.id.detailsText1);
+        textView.setText(post.getDescription());
+
+        RatingBar ratingBar = v.findViewById(R.id.ratingBar1);
+        ratingBar.setRating((float)post.getRating());
+
+        Button button = v.findViewById(R.id.button3);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                String link;
+                if(! post.getLink().startsWith("http"))
+                    link = "https://" + post.getLink();
+                else
+                    link = post.getLink();
+
+                Uri uri = Uri.parse(link);
+
+                // Open a web link !!!!
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+
+                // basically run a startActivity from a good context (of the app)
+                view.getContext().getApplicationContext().startActivity(intent);
+            }
+        });
         // TODO: perform updates to this view based on the post
     }
 
@@ -111,5 +140,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
     public void add(PostItem postItem)
     {
         posts.add(postItem);
+    }
+
+    public void clearAll()
+    {
+        posts.clear();
     }
 }
