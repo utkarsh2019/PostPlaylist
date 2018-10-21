@@ -65,24 +65,34 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //To be used for Utkarsh only. Set to 0 for all other developers
+        int testUtkarsh = 1;
+
         // This line checks if the user is already signed in
         mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
+        if (mAuth.getCurrentUser() != null || testUtkarsh == 1) {
             // already signed in
 
             FirebaseDatabase db = FirebaseDatabase.getInstance();
 
+            DatabaseReference userRoot;
             // grabbing the user at that uid, as the reference
-            DatabaseReference userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
-                    getUid());
+            if (testUtkarsh != 1) {
+                userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
+                        getUid());
+            }
+            else {
+                userRoot = db.getReference("Users/Y1ftkRetggVB7nRm18Sxw17B85G3");
+            }
 
             // will, in a higher level sense, start listening to the data.
             // it will set up the recycler and the listeners inside !!
             setUpDatabaseListening(userRoot);
 
+
             //initialising the settings menu button
             //change to category button
-            FloatingActionButton categoryButton = findViewById(R.id.category_button);
+            FloatingActionButton categoryButton = findViewById(R.id.fab);
             categoryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -93,13 +103,13 @@ public class MainActivity extends AppCompatActivity
 
 
             // temporary to create data on the database
-            String description = "a suggestion by Mohammad Ali!";
-            String link = "google.com";
-            int rating = 5;
-            String[] categories1 = {"sports", "leisure", "food"};
-            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
-            PostItem postItem = new PostItem(description, categories, link, rating);
-            userRoot.child("posts").push().setValue(postItem);
+//            String description = "a suggestion by Mohammad Ali!";
+//            String link = "google.com";
+//            int rating = 5;
+//            String[] categories1 = {"sports", "leisure", "food"};
+//            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
+//            PostItem postItem = new PostItem(description, categories, link, rating);
+//            userRoot.child("posts").push().setValue(postItem);
         }
 
         else
