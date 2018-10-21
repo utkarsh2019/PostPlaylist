@@ -102,7 +102,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
 
         RatingBar ratingBar = v.findViewById(R.id.ratingBar1);
         ratingBar.setRating((float)post.getRating());
-        textView.setOnClickListener(new View.OnClickListener()
+        v.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
@@ -110,7 +110,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
                 Intent editIntent = new Intent(view.getContext(), AddPost.class);
                 editIntent.putExtra("editFlag", true);
                 editIntent.putExtra("post", post);
-
+                context.startActivity(editIntent);
             }
         });
         Button button = v.findViewById(R.id.button3);
