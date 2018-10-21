@@ -214,6 +214,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("flag 3");
                 // remove the matching thing in the underlying arraylist
                 myAdapter.delete(PostItem.getFromMapping(dataSnapshot));
+                posts.remove(PostItem.getFromMapping(dataSnapshot));
             }
 
             @Override
