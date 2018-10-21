@@ -18,7 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
+import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -73,6 +73,17 @@ public class MainActivity extends AppCompatActivity
             // will, in a higher level sense, start listening to the data.
             // it will set up the recycler and the listeners inside !!
             setUpDatabaseListening(userRoot);
+
+            //initialising the settings menu button
+            //change to category button
+            FloatingActionButton categoryButton = findViewById(R.id.category_button);
+            categoryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
+                    startActivity(intent);
+                }
+            });
 
 
             // temporary to create data on the database
