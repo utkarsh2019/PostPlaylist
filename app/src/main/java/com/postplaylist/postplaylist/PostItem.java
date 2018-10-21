@@ -82,11 +82,19 @@ public class PostItem implements Serializable{
         this.date = date;
     }
 
-    static Comparator<PostItem> getClosestAddedComparator() {
+    static Comparator<PostItem> getClosestComparator() {
         return new Comparator<PostItem>() {
             @Override
             public int compare(PostItem postItem1, PostItem postItem2) {
                 return postItem1.getDate().compareTo(postItem2.getDate());
+            }
+        };
+    }
+    static Comparator<PostItem> getFarthestComparator() {
+        return new Comparator<PostItem>() {
+            @Override
+            public int compare(PostItem postItem1, PostItem postItem2) {
+                return postItem2.getDate().compareTo(postItem1.getDate());
             }
         };
     }
@@ -106,6 +114,7 @@ public class PostItem implements Serializable{
             postItem.setDate(date);
             return postItem;
         }
+        return null;
     }
     //add more sorting options
 

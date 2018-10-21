@@ -15,10 +15,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,6 +33,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +56,112 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //setting up the spinner
+        Spinner sortSpinner = (Spinner) findViewById(R.id.sort_spinner);
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Comparator comparator = null;
+                switch (position)
+                {
+                    case 0:
+                        // pass
+                        break;
+                    case 1:
+                        //TODO: Change the myadapter thingmthingm
+                        MyAdapter.sort(new Comparator<PostItem>()
+                        {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                return t1.getDate().compareTo(t2.getDate());
+                            }
+                        });
+                        break;
+                    case 2:
+                        dfd.sort(new Comparator<PostItem>()
+                        {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                return t1.getDate().compareTo(t2.getDate());
+                            }
+                        });
+                        break;
+                    case 3:
+                        dfd.sort(new Comparator<PostItem>()
+                        {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                float rating1 = t1.getRating();
+                                float rating2 = t2.getRating();
+                                if(rating1 > rating2){
+                                    return -1;
+                                }
+                                else if(rating2 > rating1){
+                                    return 1;
+                                }
+                                else {
+                                    return 0;
+                                }
+                            }
+                        });
+                        break;
+                    case 4:
+                        dfd.sort(new Comparator<PostItem>() {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                float rating1 = t1.getRating();
+                                float rating2 = t2.getRating();
+                                if(rating1 < rating2){
+                                    return -1;
+                                }
+                                else if(rating2 < rating1){
+                                    return 1;
+                                }
+                                else {
+                                    return 0;
+                                }
+                            }
+                        });
+                        break;
+
+                    case 5:
+                        dfd.sort(new Comparator<PostItem>() {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                if (t1.getCategories()!= null && t2.getCategories() != null){
+                                    ArrayList<String> cats1 = t1.getCategories();
+                                    ArrayList<String> cats2 = t2.getCategories();
+                                    Collections.sort(cats1);
+                                    Collections.sort(cats2);
+                                    String cat1 = cats1.get(0);
+                                    String cat2 = cats2.get(0);
+                                    int Val = cat1.compareToIgnoreCase(cat2);
+                                    if(Val > 0){
+                                        return -1;
+                                    }
+                                    else if(Val < 0){
+                                        return 1;
+                                    }
+                                    else {
+                                        return 0;
+                                    }
+                                }
+                                else
+                                    return 0;
+                                }
+                            }
+                        );
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener()
@@ -123,6 +233,8 @@ public class MainActivity extends AppCompatActivity
                             .build(),
                     AUTH_UI_REQUEST_CODE);
         }
+
+
 
 
 

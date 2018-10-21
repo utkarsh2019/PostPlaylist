@@ -12,12 +12,22 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/mainRecyclerView"
         android:layout_width="289dp"
-        android:layout_height="417dp"
+        android:layout_height="398dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="80dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/sort_spinner"
+        android:layout_width="229dp"
+        android:layout_height="32dp"
+        android:layout_weight=".60"
+        android:paddingLeft="10dp"
+        android:paddingStart="10dp"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="16dp"></Spinner>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/category_button"

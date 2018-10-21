@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
 {
@@ -89,6 +91,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
     public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, int position)
     {
         View v = holder.v;
+        PostItem post = posts.get(position);
+        //v.findViewById(R.id.);
         // TODO: perform updates to this view based on the post
     }
 
@@ -107,5 +111,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
     public void add(PostItem postItem)
     {
         posts.add(postItem);
+    }
+
+    // via category
+    public void sort(Comparator<PostItem> comp)
+    {
+        Collections.sort(posts, comp);
     }
 }
