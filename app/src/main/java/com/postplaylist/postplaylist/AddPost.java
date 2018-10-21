@@ -102,7 +102,7 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
             });
         }
         else {
-            int pos = extras.getInt("position");
+            final int pos = extras.getInt("position");
             PostItem post = MainActivity.posts.get(pos);
             String inDescription = post.getDescription();
             String inLink = post.getLink();
@@ -152,6 +152,7 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
                         DatabaseReference posts = FirebaseDatabase.getInstance().getReference(
                                 "Users/"+uid+"/posts/"+inKey);
                         posts.setValue(newPost);
+                        MainActivity.posts.set(pos, newPost);
                         finish();
                     }
                 }
