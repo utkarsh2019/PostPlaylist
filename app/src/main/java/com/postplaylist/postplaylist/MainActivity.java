@@ -79,11 +79,7 @@ public class MainActivity extends AppCompatActivity
                     return;
                 switch (position)
                 {
-                    case 0:
-                        // pass
-                        break;
                     case 1:
-                        //TODO: Change the myadapter thingmthingm
                         myAdapter.sort(new Comparator<PostItem>()
                         {
                             @Override
@@ -182,19 +178,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         //To be used for Utkarsh only. Set to 0 for all other developers
-        int testUtkarsh = 1;
+        int testUtkarsh = 0;
 
         // This line checks if the user is already signed in
         mAuth = FirebaseAuth.getInstance();

@@ -98,7 +98,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
         View v = holder.v;
         final PostItem post = posts.get(position);
         TextView textView = v.findViewById(R.id.detailsText1);
-        textView.setText(post.getDescription());
+        textView.setSingleLine(false);
+        String postDisplay = "";
+        if (post.getDescription()!= null){
+            postDisplay += post.getDescription();
+        }
+        if (post.getDate()!= null){
+            postDisplay += "\n" + post.getDate();
+        }
+        if (post.getCategories()!= null){
+            postDisplay += "\n" + post.getCategories();
+        }
+        textView.setText(postDisplay);
 
         RatingBar ratingBar = v.findViewById(R.id.ratingBar1);
         ratingBar.setRating((float)post.getRating());
