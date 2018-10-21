@@ -14,6 +14,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
 {
@@ -122,7 +124,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
                 view.getContext().getApplicationContext().startActivity(intent);
             }
         });
-        // TODO: perform updates to this view based on the post
     }
 
     @Override
@@ -145,5 +146,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
     public void clearAll()
     {
         posts.clear();
+    }
+    public void sort(Comparator<PostItem> comp)
+    {
+        Collections.sort(posts, comp);
     }
 }
