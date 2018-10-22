@@ -65,7 +65,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
     {
         LayoutInflater inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflater.inflate(R.layout.post_item_layout, null);
+        // If we do not give a root to add the view into, then the attributes of the view at the
+        // root of that XML file would be lost as there are no parents for it to have a proper
+        // LayoutParams on it.
+        // Further, RecyclerView requires that we do not attach to that root, and that is done by
+        // giving an extra argument to inflate
+        View v = inflater.inflate(R.layout.post_item_layout, parent, false);
+        System.out.println("flag 12");
+        if(ViewGroup.LayoutParams.MATCH_PARENT == v.getLayoutParams().width)
+        {
+            System.out.println("MATCH_PARENT (-1)");
+        }
+        else
+            System.out.println("not MATCH_PARENT");
         ViewHolder viewHolder = new ViewHolder(v);
 
         // TODO: add a listeners for the view itself and the link button
