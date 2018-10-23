@@ -21,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class CategoryActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -106,13 +107,18 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         if(! MainActivity.performLoginCheckup(context))
             return;
 
-        ValueEventListener valueEventListener1 = new ValueEventListener()
+        valueEventListener1 = new ValueEventListener()
         {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
                 System.out.println("flag 6");
-                ArrayList<String> categories = (ArrayList<String>) dataSnapshot.getValue();
+
+                // TODO: dummy right now, change to real obtained
+                ArrayList<String> categories = new ArrayList<>();
+                categories.add("Sports");
+                categories.add("life");
+                System.out.println(categories);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context,
                                                         android.R.layout.simple_list_item_1,
                                                         categories);
@@ -132,9 +138,9 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference userRoot = FirebaseDatabase.getInstance().
                 getReference().
-                child("/Users" + uid);
+                child("Users/" + uid);
 
-        userRoot.child("/categories").addValueEventListener(valueEventListener1);
+        userRoot.child("categories").addValueEventListener(valueEventListener1);
     }
 
     public void stopListening()
@@ -147,6 +153,6 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
 
         String uid = FirebaseAuth.getInstance().getUid();
         DatabaseReference userRoot = FirebaseDatabase.getInstance().getReference().child("Users/" + uid);
-        userRoot.child("/categories").removeEventListener(valueEventListener1);
+        userRoot.child("categories").removeEventListener(valueEventListener1);
     }
 }
