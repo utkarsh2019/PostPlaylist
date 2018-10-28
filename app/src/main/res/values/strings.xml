@@ -15,10 +15,11 @@
     <string name="type4">Article</string>
     <string name="type5">Resource</string>
     <string name="post_label">Add Post</string>
-    <string name="website_name_hint">Website name</string>
+    <string name="description">Description</string>
     <string name="link">Link *</string>
     <string name="rating">Rate</string>
     <string name="submit">Submit</string>
+    <string name="delete">Delete</string>
     <string name="category">Categories</string>
     <string name="about_us">
         About us\n

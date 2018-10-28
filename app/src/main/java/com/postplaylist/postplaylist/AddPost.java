@@ -25,73 +25,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.OnMultipleItemsSelectedListener
 {
-    private ArrayList<String> c;
+    private ArrayList<String> newSelectedArray;
 
+    boolean flag;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_post);
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        final String uid;
-
-        // TODO: call only if edit is on
-            // Kalpan code
-            runAsyncQuery(getBaseContext());
-            // Kalpan code
-
-        //To be used for Utkarsh only. Set to 0 for all other developers
-        int testUtkarsh = 1;
-
-        if (testUtkarsh != 1) {
-            uid = mAuth.getUid();
-        }
-        else {
-            uid = "Y1ftkRetggVB7nRm18Sxw17B85G3";
-        }
-
-        if (mAuth == null && testUtkarsh != 1) {
-            finish();
-        }
-        DatabaseReference categories = FirebaseDatabase.getInstance().getReference("Users/"
-                        +uid+"/categories");
-
-        String [] cats = {"Pics","Videos","News","Sports"};
-        MultiSelectionSpinner type = (MultiSelectionSpinner) findViewById(R.id.spinner_type);
-        type.setItems(cats);
-        type.setSelection(new int[]{});
-        type.setListener(this);
-
-
-        final RatingBar rating = (RatingBar) findViewById(R.id.rating_rating_bar);
-        final EditText website = (EditText) findViewById(R.id.edit_text_website);
-        final EditText link = (EditText) findViewById(R.id.edit_text_link);
-
-        Button submitButton = (Button) findViewById(R.id.submit_button);
-
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (link.getText().toString().trim().equals("")) {
-                    Toast.makeText(getBaseContext(), "Please enter a link", Toast.LENGTH_SHORT)
-                            .show();
-                }
-                else {
-                    long r = (long)rating.getRating();
-                    String d = website.getText().toString().trim();
-                    String l = link.getText().toString().trim();
-                    PostItem newPost = new PostItem(d,c,l,r);
-                    DatabaseReference posts = FirebaseDatabase.getInstance().getReference(
-                            "Users/"+uid+"/posts");
-                    posts.push().setValue(newPost);
-                    finish();
-                }
-            }
-        });
+        runAsyncQuery(getBaseContext());
     }
 
     @Override
@@ -116,9 +63,126 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
         return super.onOptionsItemSelected(item);
     }
 
-    public void setGUI(ArrayList<String> categories)
+    public void setGUI(ArrayList<String> allCategories)
     {
-        // just a dummy function to pass
+        setContentView(R.layout.add_post);
+
+        MultiSelectionSpinner type = (MultiSelectionSpinner) findViewById(R.id.spinner_type);
+
+
+
+//        String[] cats = {"Pics", "Videos", "News", "Sports"};
+        // changed below line to give allCategories instead of cats above
+        type.setItems(allCategories);
+        type.setListener(this);
+
+
+        Button submitButton = (Button) findViewById(R.id.submit_button);
+        Button deleteButton = (Button) findViewById(R.id.delete_button);
+
+        final String uid = FirebaseAuth.getInstance().getUid();
+        flag = getIntent().getBooleanExtra("editFlag", false);
+        if(!flag) {
+            type.setSelection(new int[]{});
+
+            final RatingBar rating = (RatingBar) findViewById(R.id.rating_rating_bar);
+            final EditText website = (EditText) findViewById(R.id.edit_text_website);
+            final EditText link = (EditText) findViewById(R.id.edit_text_link);
+
+            deleteButton.setClickable(false);
+            deleteButton.setAlpha(0.5f);
+
+            submitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (link.getText().toString().trim().equals("")) {
+                        Toast.makeText(getBaseContext(), "Please enter a link", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                    else {
+                        long outRating = (long)rating.getRating();
+                        String outDescription = website.getText().toString().trim();
+                        String outLink = link.getText().toString().trim();
+
+                        DatabaseReference posts = FirebaseDatabase.getInstance().getReference().child(
+                                "Users/"+uid+"/posts");
+                        String outKey = posts.push().getKey();
+                        PostItem newPost = new PostItem(outDescription,newSelectedArray,outLink,outRating,outKey);
+                        posts.child(outKey).setValue(newPost);
+                        finish();
+                    }
+                }
+            });
+        }
+        else {
+            RatingBar r = (RatingBar) findViewById(R.id.rating_rating_bar);
+            EditText w = (EditText) findViewById(R.id.edit_text_website);
+            EditText l = (EditText) findViewById(R.id.edit_text_link);
+
+            PostItem post = (PostItem)getIntent().getSerializableExtra("post");
+            String inDescription = post.getDescription();
+            String inLink = post.getLink();
+
+            ArrayList<String> inCategory = post.getCategories();
+            if(inCategory == null)
+                inCategory = new ArrayList<String>();
+            long inRating = post.getRating();
+            final String inKey = post.getKey();
+
+            r.setRating((float)inRating);
+            w.setText(inDescription);
+            l.setText(inLink);
+            ArrayList<Integer> index = new ArrayList<>();
+            for (int i=0;i < inCategory.size();i++) {
+                for (int j=0;j < allCategories.size();j++) {
+                    if (inCategory.get(i).equals(allCategories.get(j))) {
+                        index.add(j);
+                        break;
+                    }
+                }
+            }
+            int [] in = new int[index.size()];
+            for (int i=0;i < index.size(); i++) {
+                in[i] = index.get(i);
+            }
+            type.setSelection(in);
+
+            final RatingBar rating = (RatingBar) findViewById(R.id.rating_rating_bar);
+            final EditText website = (EditText) findViewById(R.id.edit_text_website);
+            final EditText link = (EditText) findViewById(R.id.edit_text_link);
+
+            submitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (link.getText().toString().trim().equals("")) {
+                        Toast.makeText(getBaseContext(), "Please enter a link",
+                                Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                    else {
+                        long outRating = (long)rating.getRating();
+                        String outDescription = website.getText().toString().trim();
+                        String outLink = link.getText().toString().trim();
+                        PostItem newPost = new PostItem(outDescription,newSelectedArray,
+                                outLink,outRating,inKey);
+                        DatabaseReference posts = FirebaseDatabase.getInstance().getReference(
+                                "Users/"+uid+"/posts/"+inKey);
+                        posts.setValue(newPost);
+                        finish();
+                    }
+                }
+            });
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DatabaseReference posts = FirebaseDatabase.getInstance().getReference(
+                            "Users/"+uid+"/posts/"+inKey);
+                    posts.setValue(null);
+                    finish();
+                }
+            });
+        }
     }
     @Override
     public void selectedIndices(List<Integer> indices) {
@@ -127,7 +191,7 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
 
     @Override
     public void selectedStrings(List<String> categories) {
-        c = new ArrayList<String>(categories);
+        newSelectedArray = new ArrayList<String>(categories);
     }
 
     public void runAsyncQuery(Context context)
@@ -135,17 +199,24 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
         if(! MainActivity.performLoginCheckup(context))
             return;
 
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference userRoot = FirebaseDatabase.getInstance().getReference().child("Users/" +
+        String uid = FirebaseAuth.getInstance().getUid();
+        DatabaseReference userRoot = FirebaseDatabase.getInstance().getReference("Users/" +
                                                                                             uid);
         ValueEventListener valueEventListener = new ValueEventListener()
         {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
-                ArrayList<String> categories;
-                categories = (ArrayList<String>) dataSnapshot.getValue();
-                setGUI(categories);
+                // TODO: check if too much work being done over here. We only can do millisecond
+                // work on this as it is in the main thread.
+                HashMap<String, Object> categoriesSnapShot;
+                categoriesSnapShot = (HashMap<String, Object>)dataSnapshot.getValue();
+
+                ArrayList<String> allCategories = new ArrayList<String>();
+                for(Object val : categoriesSnapShot.values())
+                    allCategories.add((String) val);
+
+                setGUI(allCategories);
             }
 
             @Override

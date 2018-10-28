@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity
 
     ChildEventListener childEventListener1;
 
-    FirebaseDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        setUpUI();
         // This line checks if the user is already signed in
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
@@ -69,14 +67,7 @@ public class MainActivity extends AppCompatActivity
 
             //initialising the settings menu button
             //change to category button
-            FloatingActionButton categoryButton = findViewById(R.id.fab);
-            categoryButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent startAddPost = new Intent(MainActivity.this, AddPost.class);
-                    startActivity(startAddPost);
-                }
-            });
+            setUpUI();
 
         }
 
@@ -84,8 +75,6 @@ public class MainActivity extends AppCompatActivity
         {
             // not signed in already
             // open the gui for Firebase login via Google/Facebook/ etc.
-
-            AuthUI authUI = AuthUI.getInstance();
 
             // Choose authentication providers
             List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -176,6 +165,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
             {
+                PostItem postItem = PostItem.getFromMapping(dataSnapshot);
+                myAdapter.delete(PostItem.getFromMapping(dataSnapshot));
+                myAdapter.add(postItem);
+                myAdapter.notifyDataSetChanged();
                 System.out.println("flag 2");
             }
 
@@ -185,6 +178,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("flag 3");
                 // remove the matching thing in the underlying arraylist
                 myAdapter.delete(PostItem.getFromMapping(dataSnapshot));
+                myAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -328,16 +322,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-        // set up a button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
+        //initialising the settings menu button
+        //change to category button
+        FloatingActionButton categoryButton = findViewById(R.id.fab);
+        categoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View view) {
+                Intent startAddPost = new Intent(MainActivity.this, AddPost.class);
+                startAddPost.putExtra("editPost",false);
+                startActivity(startAddPost);
             }
         });
     }
@@ -376,9 +369,13 @@ public class MainActivity extends AppCompatActivity
         if(FirebaseAuth.getInstance().getCurrentUser() == null)
             return;
 
+        mAuth = FirebaseAuth.getInstance();
         String uid = mAuth.getUid();
-        DatabaseReference userRoot = FirebaseDatabase.getInstance().getReference().child("Users/" + uid);
-        userRoot.child("/posts").removeEventListener(childEventListener1);
+        DatabaseReference userRoot = FirebaseDatabase.
+                getInstance().
+                getReference("Users/" + uid);
+
+        userRoot.child("posts").removeEventListener(childEventListener1);
         System.out.println("flag 9");
     }
     @Override
@@ -394,18 +391,28 @@ public class MainActivity extends AppCompatActivity
     {
         super.onStart();
 
+        System.out.println("flag 21");
+        // if logged out, then
         if(FirebaseAuth.getInstance().getCurrentUser() == null)
-            return;
+        {
+            // TODO: think about how to logout if logged out. Important: if you call it over here,
+            // it will be an infinite call as that recreates and calls onStart
 
+            return;
+        }
+
+
+        System.out.println("flag 22");
+        mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase db = FirebaseDatabase.getInstance();
 
         DatabaseReference userRoot;
         // grabbing the user at that uid, as the reference
-        userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
-                getUid());
+        userRoot = db.getReference("Users/" + mAuth.getUid());
 
         // will, in a higher level sense, start listening to the data.
         // it will set up the recycler and the listeners inside !!
         setUpDatabaseListening(userRoot);
+        System.out.println("flag 23");
     }
 }
