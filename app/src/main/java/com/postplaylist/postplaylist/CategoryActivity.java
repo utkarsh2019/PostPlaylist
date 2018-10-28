@@ -21,12 +21,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CategoryActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private Button logoutButton;
-    private Button savebutton;
     private EditText CatEditText;
     private ValueEventListener valueEventListener1;
 
@@ -35,6 +35,8 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
+        Button logoutButton;
+        Button savebutton;
         System.out.println("flag 8");
         logoutButton = (Button) findViewById(R.id.logout_button);
         savebutton = (Button) findViewById(R.id.save_button);
@@ -42,6 +44,18 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
 
         logoutButton.setOnClickListener(this);
         savebutton.setOnClickListener(this);
+
+        // setting up the listView to display the categories. They will be displayed asynchronously
+        // after onStart is called. We pair stop and start for firebase with onStart and onStop
+        ListView categoryList = findViewById(R.id.category_listview);
+
+        ArrayAdapter<String> categoryListAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1);
+
+        categoryList.setAdapter(categoryListAdapter);
+
+
 
         System.out.println("flag 8");
         }
@@ -103,9 +117,12 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
     public void setUpListening()
     {
         System.out.println("flag 7");
-        final Context context = getBaseContext();
-        if(! MainActivity.performLoginCheckup(context))
+        if(FirebaseAuth.getInstance().getCurrentUser() == null)
             return;
+
+        ListView categoryList = findViewById(R.id.category_listview);
+        final ArrayAdapter<String> categoryListAdapter = (ArrayAdapter<String>) categoryList.getAdapter();
+
 
         valueEventListener1 = new ValueEventListener()
         {
@@ -114,16 +131,14 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
             {
                 System.out.println("flag 6");
 
-                // TODO: dummy right now, change to real obtained
-                ArrayList<String> categories = new ArrayList<>();
-                categories.add("Sports");
-                categories.add("life");
-                System.out.println(categories);
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context,
-                                                        android.R.layout.simple_list_item_1,
-                                                        categories);
-                ListView listView = findViewById(R.id.category_listview);
-                listView.setAdapter(arrayAdapter);
+                HashMap<String, Object> categoriesSnapShot;
+                categoriesSnapShot = (HashMap<String, Object>)dataSnapshot.getValue();
+                ArrayList<String> categories = new ArrayList<String>();
+                for(Object val : categoriesSnapShot.values())
+                    categories.add((String) val);
+                categoryListAdapter.clear();
+                categoryListAdapter.addAll(categories);
+                categoryListAdapter.notifyDataSetChanged();
 
             }
 
