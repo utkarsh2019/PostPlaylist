@@ -105,7 +105,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
      * @param position The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, final int position)
+    public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, int position)
     {
         View v = holder.v;
         final PostItem post = posts.get(position);

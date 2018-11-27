@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
     // Posts and categories of the user. TODO: these might me in size of MB's later on !?
     public static ArrayList<String> categories;
-    public static ArrayList<PostItem> posts;
+    public static ArrayList<String> posts;
     public static MyAdapter myAdapter;
 
     ChildEventListener childEventListener1;
@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        posts = new ArrayList<  PostItem>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -157,10 +156,9 @@ public class MainActivity extends AppCompatActivity
             {
                 System.out.println("flag 1");
                 System.out.println(dataSnapshot.getValue());
-                PostItem postItem = PostItem.getFromMapping(dataSnapshot);
-                myAdapter.add(postItem);
+
+                myAdapter.add(PostItem.getFromMapping(dataSnapshot));
                 myAdapter.notifyDataSetChanged();
-                posts.add(postItem);
 
             }
 
@@ -172,7 +170,6 @@ public class MainActivity extends AppCompatActivity
                 myAdapter.add(postItem);
                 myAdapter.notifyDataSetChanged();
                 System.out.println("flag 2");
-                myAdapter.notifyDataSetChanged();
             }
 
             @Override
