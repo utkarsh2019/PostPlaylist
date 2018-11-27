@@ -124,7 +124,7 @@ public class PostItem implements Serializable {
 
             if(child.getValue() == null)
                 throw new DatabaseException("A child of post (category, rating, etc.) returned null"
-                + " for on getValue()");
+                        + " for on getValue()");
 
             if(child.getKey().equals("description"))
             {
@@ -169,10 +169,8 @@ public class PostItem implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this.getLink().equals(((PostItem) obj).getLink())){
-            return true;
-        }
-        else
-            return false;
+        if(obj.getClass() != PostItem.class)
+            throw new IllegalArgumentException("Not a post item for comparision");
+        return this.getKey().equals(((PostItem) obj).getKey());
     }
 }
