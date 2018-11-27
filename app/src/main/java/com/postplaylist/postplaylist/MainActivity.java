@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity
                 posts.remove(postItem);
                 posts.add(postItem);
                 System.out.println("flag 2");
+                myAdapter.notifyDataSetChanged();
             }
 
             @Override
