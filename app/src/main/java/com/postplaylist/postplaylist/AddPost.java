@@ -1,7 +1,11 @@
+// TODO: remove the listeners when you exit the activity
+
 package com.postplaylist.postplaylist;
 
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +15,9 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.guna.libmultispinner.MultiSelectionSpinner;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,58 +25,62 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.OnMultipleItemsSelectedListener
 {
-    private boolean flag;
     private ArrayList<String> newSelectedArray;
 
+    boolean flag;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_post);
-        Bundle extras = getIntent().getExtras();
-        flag = extras.getBoolean("editFlag",false);
-        ArrayList<String> allCategories = new ArrayList<>();
-        allCategories.add("Pics");
-        allCategories.add("Videos");
-        allCategories.add("News");
-        allCategories.add("Sports");
+        runAsyncQuery(getBaseContext());
+    }
 
-        final String uid;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-        //To be used for Utkarsh only. Set to 0 for all other developers
-        int testUtkarsh = 1;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
-        if(mAuth.getCurrentUser() == null && testUtkarsh != 1) {
-            finish();
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
         }
 
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void setGUI(ArrayList<String> allCategories)
+    {
+        setContentView(R.layout.add_post);
 
         MultiSelectionSpinner type = (MultiSelectionSpinner) findViewById(R.id.spinner_type);
-        String[] cats = {"Pics", "Videos", "News", "Sports"};
-        type.setItems(cats);
+
+
+
+//        String[] cats = {"Pics", "Videos", "News", "Sports"};
+        // changed below line to give allCategories instead of cats above
+        type.setItems(allCategories);
         type.setListener(this);
 
-        RatingBar r = (RatingBar) findViewById(R.id.rating_rating_bar);
-        EditText w = (EditText) findViewById(R.id.edit_text_website);
-        EditText l = (EditText) findViewById(R.id.edit_text_link);
 
         Button submitButton = (Button) findViewById(R.id.submit_button);
         Button deleteButton = (Button) findViewById(R.id.delete_button);
 
-        if (testUtkarsh != 1) {
-            uid = mAuth.getCurrentUser().getUid();
-        } else {
-            uid = "Y1ftkRetggVB7nRm18Sxw17B85G3";
-        }
-
-        DatabaseReference categories = FirebaseDatabase.getInstance().getReference("Users/"
-                + uid + "/categories");
-
+        final String uid = FirebaseAuth.getInstance().getUid();
+        flag = getIntent().getBooleanExtra("editFlag", false);
         if(!flag) {
             type.setSelection(new int[]{});
 
@@ -78,6 +89,7 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
             final EditText link = (EditText) findViewById(R.id.edit_text_link);
 
             deleteButton.setClickable(false);
+            deleteButton.setAlpha(0.5f);
 
             submitButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -102,8 +114,11 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
             });
         }
         else {
-            final int pos = extras.getInt("position");
-            PostItem post = MainActivity.posts.get(pos);
+            RatingBar r = (RatingBar) findViewById(R.id.rating_rating_bar);
+            EditText w = (EditText) findViewById(R.id.edit_text_website);
+            EditText l = (EditText) findViewById(R.id.edit_text_link);
+
+            PostItem post = (PostItem)getIntent().getSerializableExtra("post");
             String inDescription = post.getDescription();
             String inLink = post.getLink();
 
@@ -152,7 +167,6 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
                         DatabaseReference posts = FirebaseDatabase.getInstance().getReference(
                                 "Users/"+uid+"/posts/"+inKey);
                         posts.setValue(newPost);
-//                        MainActivity.posts.set(pos, newPost);
                         finish();
                     }
                 }
@@ -169,29 +183,6 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
             });
         }
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     @Override
     public void selectedIndices(List<Integer> indices) {
 
@@ -200,5 +191,42 @@ public class AddPost extends AppCompatActivity implements MultiSelectionSpinner.
     @Override
     public void selectedStrings(List<String> categories) {
         newSelectedArray = new ArrayList<String>(categories);
+    }
+
+    public void runAsyncQuery(Context context)
+    {
+        if(! MainActivity.performLoginCheckup(context))
+            return;
+
+        String uid = FirebaseAuth.getInstance().getUid();
+        DatabaseReference userRoot = FirebaseDatabase.getInstance().getReference("Users/" +
+                                                                                            uid);
+        ValueEventListener valueEventListener = new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                // TODO: check if too much work being done over here. We only can do millisecond
+                // work on this as it is in the main thread.
+                System.out.println("flag 25");
+                HashMap<String, Object> categoriesSnapShot;
+                categoriesSnapShot = (HashMap<String, Object>)dataSnapshot.getValue();
+
+                ArrayList<String> allCategories = new ArrayList<String>();
+                for(Object val : categoriesSnapShot.values())
+                    allCategories.add((String) val);
+
+                setGUI(allCategories);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+
+            }
+        };
+
+        userRoot.child("categories").addValueEventListener(valueEventListener);
+
     }
 }

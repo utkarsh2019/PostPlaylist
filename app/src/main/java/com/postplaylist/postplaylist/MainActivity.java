@@ -15,10 +15,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +50,8 @@ public class MainActivity extends AppCompatActivity
     public static ArrayList<PostItem> posts;
     public static MyAdapter myAdapter;
 
-    FirebaseDatabase database;
+    ChildEventListener childEventListener1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -55,63 +61,21 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //To be used for Utkarsh only. Set to 0 for all other developers
-        int testUtkarsh = 1;
-
         // This line checks if the user is already signed in
         mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null || testUtkarsh == 1) {
+        if (mAuth.getCurrentUser() != null) {
             // already signed in
-
-            FirebaseDatabase db = FirebaseDatabase.getInstance();
-
-            DatabaseReference userRoot;
-            // grabbing the user at that uid, as the reference
-            if (testUtkarsh != 1) {
-                userRoot = db.getReference("Users/" + mAuth.getCurrentUser().
-                        getUid());
-            }
-            else {
-                userRoot = db.getReference("Users/Y1ftkRetggVB7nRm18Sxw17B85G3");
-            }
-
-            // will, in a higher level sense, start listening to the data.
-            // it will set up the recycler and the listeners inside !!
-            setUpDatabaseListening(userRoot);
-
 
             //initialising the settings menu button
             //change to category button
-            FloatingActionButton categoryButton = findViewById(R.id.fab);
-            categoryButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent startAddPost = new Intent(MainActivity.this, AddPost.class);
-                    startAddPost.putExtra("editPost",false);
-                    startAddPost.setFlags(0);
-                    startActivity(startAddPost);
-                }
-            });
+            setUpUI();
 
-
-            // temporary to create data on the database
-//            String description = "a suggestion by Mohammad Ali!";
-//            String link = "boilermake.org";
-//            int rating = 5;
-//            String[] categories1 = {"sports", "leisure", "food"};
-//            ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories1));
-//
-//            String k = userRoot.child("posts").push().getKey();
-//            PostItem postItem = new PostItem(description, categories, link, rating, k);
-//            userRoot.child("posts").child(k).setValue(postItem);
         }
 
         else
         {
             // not signed in already
             // open the gui for Firebase login via Google/Facebook/ etc.
-
-            AuthUI authUI = AuthUI.getInstance();
 
             // Choose authentication providers
             List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -153,7 +117,6 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -164,7 +127,7 @@ public class MainActivity extends AppCompatActivity
         if(requestCode == AUTH_UI_REQUEST_CODE)
         {
             if (resultCode == RESULT_OK) {
-                // Successfully signed in
+                mAuth = FirebaseAuth.getInstance();
                 recreate();
                 // ...
             } else {
@@ -186,7 +149,7 @@ public class MainActivity extends AppCompatActivity
         myAdapter = new MyAdapter(this, new ArrayList<PostItem>());
         recyclerView.setAdapter(myAdapter);
 
-        ChildEventListener childEventListener = new ChildEventListener()
+        childEventListener1 = new ChildEventListener()
         {
 
             @Override
@@ -207,8 +170,7 @@ public class MainActivity extends AppCompatActivity
                 PostItem postItem = PostItem.getFromMapping(dataSnapshot);
                 myAdapter.delete(PostItem.getFromMapping(dataSnapshot));
                 myAdapter.add(postItem);
-                posts.remove(postItem);
-                posts.add(postItem);
+                myAdapter.notifyDataSetChanged();
                 System.out.println("flag 2");
                 myAdapter.notifyDataSetChanged();
             }
@@ -219,7 +181,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("flag 3");
                 // remove the matching thing in the underlying arraylist
                 myAdapter.delete(PostItem.getFromMapping(dataSnapshot));
-                posts.remove(PostItem.getFromMapping(dataSnapshot));
+                myAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -235,13 +197,152 @@ public class MainActivity extends AppCompatActivity
             }
         };
 
-        aUser.child("posts").addChildEventListener(childEventListener);
+        aUser.child("posts").addChildEventListener(childEventListener1);
+    }
+
+    public void setUpUI()
+    {
+        //setting up the spinner
+        Spinner sortSpinner = (Spinner) findViewById(R.id.sort_spinner);
+        ArrayList<String> sortByStrings = new ArrayList<>();
+        sortByStrings.add("Date: Newest");
+        sortByStrings.add("Date: Oldest");
+        sortByStrings.add("Rating: Highest");
+        sortByStrings.add("Rating: Lowest");
+        sortByStrings.add("Category");
+        ArrayAdapter arrayAdapter = new ArrayAdapter(
+                getBaseContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                sortByStrings);
+        sortSpinner.setAdapter(arrayAdapter);
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(myAdapter == null)
+                    return;
+                switch (position)
+                {
+                    case 0:
+                        // pass
+                        break;
+                    case 1:
+                        //TODO: Change the myadapter thingmthingm
+                        myAdapter.sort(new Comparator<PostItem>()
+                        {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                return t1.getDate().compareTo(t2.getDate());
+                            }
+                        });
+                        myAdapter.notifyDataSetChanged();
+                        break;
+                    case 2:
+                        myAdapter.sort(new Comparator<PostItem>()
+                        {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                return t1.getDate().compareTo(t2.getDate());
+                            }
+                        });
+                        myAdapter.notifyDataSetChanged();
+                        break;
+                    case 3:
+                        myAdapter.sort(new Comparator<PostItem>()
+                        {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                float rating1 = t1.getRating();
+                                float rating2 = t2.getRating();
+                                if(rating1 > rating2){
+                                    return -1;
+                                }
+                                else if(rating2 > rating1){
+                                    return 1;
+                                }
+                                else {
+                                    return 0;
+                                }
+                            }
+                        });
+                        myAdapter.notifyDataSetChanged();
+                        break;
+                    case 4:
+                        myAdapter.sort(new Comparator<PostItem>() {
+                            @Override
+                            public int compare(PostItem t1, PostItem t2) {
+                                float rating1 = t1.getRating();
+                                float rating2 = t2.getRating();
+                                if(rating1 < rating2){
+                                    return -1;
+                                }
+                                else if(rating2 < rating1){
+                                    return 1;
+                                }
+                                else {
+                                    return 0;
+                                }
+                            }
+                        });
+                        myAdapter.notifyDataSetChanged();
+                        break;
+
+                    case 5:
+                        myAdapter.sort(new Comparator<PostItem>() {
+                                           @Override
+                                           public int compare(PostItem t1, PostItem t2) {
+                                               if (t1.getCategories()!= null && t2.getCategories() != null){
+                                                   ArrayList<String> cats1 = t1.getCategories();
+                                                   ArrayList<String> cats2 = t2.getCategories();
+                                                   Collections.sort(cats1);
+                                                   Collections.sort(cats2);
+                                                   String cat1 = cats1.get(0);
+                                                   String cat2 = cats2.get(0);
+                                                   int Val = cat1.compareToIgnoreCase(cat2);
+                                                   if(Val > 0){
+                                                       return -1;
+                                                   }
+                                                   else if(Val < 0){
+                                                       return 1;
+                                                   }
+                                                   else {
+                                                       return 0;
+                                                   }
+                                               }
+                                               else
+                                                   return 0;
+                                           }
+                                       }
+                        );
+                        myAdapter.notifyDataSetChanged();
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        //initialising the settings menu button
+        //change to category button
+        FloatingActionButton categoryButton = findViewById(R.id.fab);
+        categoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent startAddPost = new Intent(MainActivity.this, AddPost.class);
+                startAddPost.putExtra("editPost",false);
+                startActivity(startAddPost);
+            }
+        });
     }
 
     public static boolean performLoginCheckup(Context context)
     {
-        if(mAuth == null)
+        if(FirebaseAuth.getInstance().getCurrentUser() == null)
         {
+            System.out.println("flag 11");
             Intent openLogin = new Intent(context, MainActivity.class);
             openLogin.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             context.startActivity(openLogin);
@@ -263,5 +364,58 @@ public class MainActivity extends AppCompatActivity
         // TODO: clear the adapter data after a logout too. Or think about clearing the window data
 //        MainActivity.myAdapter
         performLoginCheckup(context);
+    }
+
+    public void stopListening()
+    {
+        super.onStop();
+        if(FirebaseAuth.getInstance().getCurrentUser() == null)
+            return;
+
+        mAuth = FirebaseAuth.getInstance();
+        String uid = mAuth.getUid();
+        DatabaseReference userRoot = FirebaseDatabase.
+                getInstance().
+                getReference("Users/" + uid);
+
+        userRoot.child("posts").removeEventListener(childEventListener1);
+        System.out.println("flag 9");
+    }
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        stopListening();
+
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+
+        System.out.println("flag 21");
+        // if logged out, then
+        if(FirebaseAuth.getInstance().getCurrentUser() == null)
+        {
+            // TODO: think about how to logout if logged out. Important: if you call it over here,
+            // it will be an infinite call as that recreates and calls onStart
+
+            return;
+        }
+
+
+        System.out.println("flag 22");
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+
+        DatabaseReference userRoot;
+        // grabbing the user at that uid, as the reference
+        userRoot = db.getReference("Users/" + mAuth.getUid());
+
+        // will, in a higher level sense, start listening to the data.
+        // it will set up the recycler and the listeners inside !!
+        setUpDatabaseListening(userRoot);
+        System.out.println("flag 23");
     }
 }
