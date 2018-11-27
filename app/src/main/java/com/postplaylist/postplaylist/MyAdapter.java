@@ -14,8 +14,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
 {
@@ -65,19 +63,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
     {
         LayoutInflater inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        // If we do not give a root to add the view into, then the attributes of the view at the
-        // root of that XML file would be lost as there are no parents for it to have a proper
-        // LayoutParams on it.
-        // Further, RecyclerView requires that we do not attach to that root, and that is done by
-        // giving an extra argument to inflate
-        View v = inflater.inflate(R.layout.post_item_layout, parent, false);
-        System.out.println("flag 12");
-        if(ViewGroup.LayoutParams.MATCH_PARENT == v.getLayoutParams().width)
-        {
-            System.out.println("MATCH_PARENT (-1)");
-        }
-        else
-            System.out.println("not MATCH_PARENT");
+        View v = inflater.inflate(R.layout.post_item_layout, null);
         ViewHolder viewHolder = new ViewHolder(v);
 
         // TODO: add a listeners for the view itself and the link button
@@ -114,18 +100,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
 
         RatingBar ratingBar = v.findViewById(R.id.ratingBar1);
         ratingBar.setRating((float)post.getRating());
-        v.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                Intent editIntent = new Intent(view.getContext(), AddPost.class);
-                editIntent.putExtra("editFlag", true);
-                editIntent.putExtra("post", post);
-                context.startActivity(editIntent);
-            }
 
-<<<<<<< HEAD
         v.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -136,8 +111,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
                 intent.putExtra("position", position);
                 view.getContext().startActivity(intent);
             }
-=======
->>>>>>> e99b71a175b416dfb3c33e1d11e0ef9aa71c482f
         });
         Button button = v.findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener()
@@ -160,6 +133,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
                 view.getContext().getApplicationContext().startActivity(intent);
             }
         });
+        // TODO: perform updates to this view based on the post
     }
 
     @Override
@@ -182,9 +156,5 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>
     public void clearAll()
     {
         posts.clear();
-    }
-    public void sort(Comparator<PostItem> comp)
-    {
-        Collections.sort(posts, comp);
     }
 }
